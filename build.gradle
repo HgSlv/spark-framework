@@ -1,0 +1,30 @@
+group 'com.HgSlv'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+// We want to use Java 8
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.sparkjava:spark-core:2.5' // Spark 2.5 is the version we would like to use
+    compile 'org.slf4j:slf4j-simple:1.7.21' // Without this, you will get SLF4J-related error with more recent versions of Spark
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+// This task is needed by Heroku
+task stage {
+    dependsOn build
+}
+
+// This task copies dependencies that are pulled down from Maven
+// and copies into a directory specified in Procfile
+task copyToLib(type: Copy) {
+    into "$buildDir/libs"
+    from(configurations.compile)
+}
+stage.dependsOn(copyToLib)
